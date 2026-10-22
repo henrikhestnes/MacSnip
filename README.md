@@ -12,6 +12,8 @@ cp -R dist/MacSnip.app /Applications/
 open /Applications/MacSnip.app
 ```
 
+MacSnip turns on **Launch at Login** the first time it runs. Turn it off from the menu bar icon; MacSnip won't turn it back on.
+
 On first launch, macOS asks for **Screen Recording** access. Enable MacSnip in **System Settings → Privacy & Security → Screen & System Audio Recording**, then quit and reopen MacSnip.
 
 The build is ad-hoc signed, so macOS treats every rebuild as a new app and silently stops honoring the permission. After rebuilding, remove MacSnip from that list (−), add it again, and relaunch. To avoid this, sign with a stable certificate: `SIGN_IDENTITY="Apple Development: …" ./scripts/build.sh`.

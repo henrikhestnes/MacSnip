@@ -18,6 +18,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         NSApp.setActivationPolicy(.accessory)
         Preferences.registerDefaults()
         configureMenu()
+        enableLaunchAtLoginOnFirstRun()
         hotKey.onPress = { [weak self] in self?.startCapture() }
         shortcutErrors = hotKey.register(shortcuts).map { "\($0.shortcut) (\($0.status))" }
         refreshMenu()
@@ -82,6 +83,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         let folder = Preferences.saveFolder
         try? FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
         NSWorkspace.shared.open(folder)
+    }
+
+    /// Launch at Login defaults to on, but only once, so turning it off in the menu sticks.
+    private func enableLaunchAtLoginOnFirstRun() {
+        let key = "launchAtLoginConfigured"
+        // Skip `swift run` binaries and translocated copies, whose paths would not survive a restart.
+        let path = Bundle.main.bundlePath
+        guard !UserDefaults.standard.bool(forKey: key), path.hasSuffix(".app"), !path.contains("/AppTranslocation/") else { return }
+        if SMAppService.mainApp.status == .notRegistered, (try? SMAppService.mainApp.register()) == nil { return }
+        UserDefaults.standard.set(true, forKey: key)
     }
 
     @objc private func toggleLaunchAtLogin() {
