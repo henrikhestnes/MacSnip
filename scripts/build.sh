@@ -5,9 +5,17 @@ cd "${0:A:h:h}"
 # Keep compiler caches inside the project so builds work in restricted environments.
 export CLANG_MODULE_CACHE_PATH="$PWD/.build/clang-cache"
 export SWIFTPM_MODULECACHE_OVERRIDE="$PWD/.build/module-cache"
-# Screen Recording permission is tied to the signature. With the default ad-hoc signature,
-# macOS forgets the permission after every rebuild; set SIGN_IDENTITY to a stable certificate to avoid that.
-identity="${SIGN_IDENTITY:--}"
+# Screen Recording permission is tied to the signature. With an ad-hoc signature, macOS forgets
+# the permission after every rebuild, so sign with the stable "MacSnip Release" certificate when it
+# is in the keychain. Set SIGN_IDENTITY to use another certificate, or "-" to force ad-hoc signing.
+identity="${SIGN_IDENTITY:-}"
+if [[ -z "$identity" ]]; then
+  if security find-certificate -c "MacSnip Release" >/dev/null 2>&1; then
+    identity="MacSnip Release"
+  else
+    identity="-"
+  fi
+fi
 architectures=()
 if [[ "${1:-}" == "--universal" ]]; then
   architectures=(--arch arm64 --arch x86_64)

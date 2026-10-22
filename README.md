@@ -10,7 +10,7 @@ Press **Hyper+P**. The screen freezes and dims, and a toolbar appears at the bot
 brew install --cask henrikhestnes/tap/macsnip
 ```
 
-Update with `brew update` and `brew upgrade --cask macsnip`. You can also download `MacSnip.zip` from the [latest release](https://github.com/henrikhestnes/MacSnip/releases/latest) and move **MacSnip.app** to **Applications**. The release is ad-hoc signed and not notarized by Apple, so macOS may block it through Gatekeeper.
+Update with `brew update` and `brew upgrade --cask macsnip`. You can also download `MacSnip.zip` from the [latest release](https://github.com/henrikhestnes/MacSnip/releases/latest) and move **MacSnip.app** to **Applications**. The release is signed with a self-signed certificate and not notarized by Apple, so macOS may block it through Gatekeeper.
 
 To build from source instead:
 
@@ -24,7 +24,7 @@ MacSnip turns on **Launch at Login** the first time it runs. Turn it off from th
 
 On first launch, macOS asks for **Screen Recording** access. Enable MacSnip in **System Settings → Privacy & Security → Screen & System Audio Recording**, then quit and reopen MacSnip.
 
-The build is ad-hoc signed, so macOS treats every rebuild or upgrade as a new app and silently stops honoring the permission. After rebuilding, remove MacSnip from that list (−), add it again, and relaunch. To avoid this, sign with a stable certificate: `SIGN_IDENTITY="Apple Development: …" ./scripts/build.sh`.
+Releases are signed with the same self-signed "MacSnip Release" certificate, so the permission carries over to upgrades. Builds from source are ad-hoc signed unless that certificate is in your keychain, and macOS treats every ad-hoc rebuild as a new app and silently stops honoring the permission. After rebuilding, remove MacSnip from that list (−), add it again, and relaunch. To avoid this, sign with a stable certificate: `SIGN_IDENTITY="Apple Development: …" ./scripts/build.sh`.
 
 ## Using it
 
@@ -55,4 +55,4 @@ Names follow `yyyy-mm-dd_hh.mm.ss` on a 24-hour clock, for example `2026-10-22_1
 
 ## Releasing
 
-Bump `CFBundleShortVersionString` in `Resources/Info.plist`, run `./scripts/build.sh --universal`, put the new version and the SHA-256 of `dist/MacSnip.zip` in `Casks/macsnip.rb`, and write `releases/vX.Y.Z.md`. `./scripts/publish.sh --check` validates everything offline; `./scripts/publish.sh` tags the release, uploads the ZIP, and updates the cask in [henrikhestnes/homebrew-tap](https://github.com/henrikhestnes/homebrew-tap).
+Bump `CFBundleShortVersionString` in `Resources/Info.plist`, run `./scripts/build.sh --universal`, put the new version and the SHA-256 of `dist/MacSnip.zip` in `Casks/macsnip.rb`, and write `releases/vX.Y.Z.md`. The build must be signed with the "MacSnip Release" certificate from the login keychain; `publish.sh` refuses any other signature, because a new certificate would make every user grant Screen Recording again. `./scripts/publish.sh --check` validates everything offline; `./scripts/publish.sh` tags the release, uploads the ZIP, and updates the cask in [henrikhestnes/homebrew-tap](https://github.com/henrikhestnes/homebrew-tap).
