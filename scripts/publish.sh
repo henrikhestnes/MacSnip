@@ -56,7 +56,7 @@ print(f'Validated MacSnip {version}, release notes, cask, ZIP, and commit email.
 PY
 codesign --verify --deep --strict dist/MacSnip.app
 # Every release must use the hardened runtime (./scripts/build.sh signs with --options runtime).
-if ! codesign -d --verbose=1 dist/MacSnip.app 2>&1 | /usr/bin/grep -Eq '^CodeDirectory .*flags=0x[0-9a-f]+\([^)]*runtime'; then
+if [[ ! "$(codesign -d --verbose=1 dist/MacSnip.app 2>&1)" =~ 'flags=0x[0-9a-f]+\([^)]*runtime' ]]; then
   print -u2 'The app is not signed with the hardened runtime. Rebuild with ./scripts/build.sh --universal.'
   exit 1
 fi
