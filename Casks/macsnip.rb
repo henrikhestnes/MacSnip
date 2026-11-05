@@ -1,6 +1,6 @@
 cask "macsnip" do
-  version "1.0.1"
-  sha256 "1738908f6436803d67a606dac7d0c8a9881e04dcbb6da0116132e6f1089363fa"
+  version "1.0.2"
+  sha256 "f916192bbf27763603c9ec36acbac092e5f1be915ce88e48dcbbd75f97af5fbc"
 
   url "https://github.com/henrikhestnes/MacSnip/releases/download/v#{version}/MacSnip.zip"
   name "MacSnip"
