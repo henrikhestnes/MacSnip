@@ -30,7 +30,9 @@ mv -f "$app/Contents/MacOS/MacSnip.new" "$app/Contents/MacOS/MacSnip"
 cp Resources/Info.plist "$app/Contents/Info.plist"
 swift scripts/make-icon.swift "$PWD/dist"
 cp "$PWD/dist/AppIcon.icns" "$app/Contents/Resources/AppIcon.icns"
-codesign --force --sign "$identity" --identifier io.macsnip.app "$app"
+# The hardened runtime enables library validation and ignores DYLD_* variables, so another process
+# cannot inject code into an app that holds Screen Recording access. It works with any signature.
+codesign --force --options runtime --sign "$identity" --identifier io.macsnip.app "$app"
 ditto -c -k --sequesterRsrc --keepParent "$app" "$PWD/dist/MacSnip.zip"
 echo "Built: $app"
 echo "Install: cp -R dist/MacSnip.app /Applications/ && open /Applications/MacSnip.app"

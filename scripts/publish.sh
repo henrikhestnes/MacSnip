@@ -55,6 +55,11 @@ with ZipFile(asset) as archive:
 print(f'Validated MacSnip {version}, release notes, cask, ZIP, and commit email.')
 PY
 codesign --verify --deep --strict dist/MacSnip.app
+# Every release must use the hardened runtime (./scripts/build.sh signs with --options runtime).
+if ! codesign -d --verbose=1 dist/MacSnip.app 2>&1 | /usr/bin/grep -Eq '^CodeDirectory .*flags=0x[0-9a-f]+\([^)]*runtime'; then
+  print -u2 'The app is not signed with the hardened runtime. Rebuild with ./scripts/build.sh --universal.'
+  exit 1
+fi
 # Screen Recording permission survives upgrades only while every release is signed with the same certificate.
 if [[ "$(codesign -dr - dist/MacSnip.app 2>&1)" != *'identifier "io.macsnip.app" and certificate leaf = H"60e479dee9ef30d9ac25735c29c78e492c875bea"'* ]]; then
   print -u2 'Sign the release with the "MacSnip Release" certificate (./scripts/build.sh --universal).'
