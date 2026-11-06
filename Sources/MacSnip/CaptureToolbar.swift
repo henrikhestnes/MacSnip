@@ -6,10 +6,12 @@ final class CaptureToolbar: NSVisualEffectView {
     private let modes = NSSegmentedControl(labels: ["Selection", "Screen", "Window"], trackingMode: .selectOne,
                                            target: nil, action: nil)
     private let hint = NSTextField(labelWithString: "")
+    private let releaseToggle = NSButton(checkboxWithTitle: "Capture as soon as the mouse is released",
+                                         target: nil, action: nil)
 
     init(session: CaptureSession) {
         self.session = session
-        super.init(frame: NSRect(x: 0, y: 0, width: 452, height: 88))
+        super.init(frame: NSRect(x: 0, y: 0, width: 452, height: 112))
         appearance = NSAppearance(named: .darkAqua)
         material = .hudWindow
         blendingMode = .withinWindow
@@ -27,11 +29,11 @@ final class CaptureToolbar: NSVisualEffectView {
         modes.target = self
         modes.action = #selector(modeChanged)
         modes.refusesFirstResponder = true
-        modes.frame = NSRect(x: 16, y: 40, width: 312, height: 30)
+        modes.frame = NSRect(x: 16, y: 64, width: 312, height: 30)
         modes.toolTip = "S, C or W"
         addSubview(modes)
 
-        let shutter = ShutterButton(frame: NSRect(x: 344, y: 34, width: 44, height: 44))
+        let shutter = ShutterButton(frame: NSRect(x: 344, y: 58, width: 44, height: 44))
         shutter.target = self
         shutter.action = #selector(captureClicked)
         shutter.toolTip = "Capture (Enter)"
@@ -44,9 +46,18 @@ final class CaptureToolbar: NSVisualEffectView {
         close.refusesFirstResponder = true
         close.imageScaling = .scaleProportionallyUpOrDown
         close.contentTintColor = .secondaryLabelColor
-        close.frame = NSRect(x: 404, y: 42, width: 28, height: 28)
+        close.frame = NSRect(x: 404, y: 66, width: 28, height: 28)
         close.toolTip = "Cancel (Esc)"
         addSubview(close)
+
+        releaseToggle.font = .systemFont(ofSize: 12)
+        releaseToggle.target = self
+        releaseToggle.action = #selector(releaseToggled)
+        releaseToggle.refusesFirstResponder = true
+        releaseToggle.sizeToFit()
+        releaseToggle.setFrameOrigin(NSPoint(x: (frame.width - releaseToggle.frame.width) / 2, y: 34))
+        releaseToggle.toolTip = "Off: adjust the selection, then press Enter or the shutter to capture"
+        addSubview(releaseToggle)
 
         hint.font = .systemFont(ofSize: 11)
         hint.textColor = .secondaryLabelColor
@@ -68,6 +79,8 @@ final class CaptureToolbar: NSVisualEffectView {
 
     func update(mode: CaptureMode, captureOnRelease: Bool) {
         modes.selectedSegment = mode.rawValue
+        releaseToggle.state = captureOnRelease ? .on : .off
+        releaseToggle.isEnabled = mode == .selection
         switch mode {
         case .selection:
             hint.stringValue = captureOnRelease ? "Drag to capture an area · Esc to cancel"
@@ -81,6 +94,7 @@ final class CaptureToolbar: NSVisualEffectView {
         guard let mode = CaptureMode(rawValue: modes.selectedSegment) else { return }
         session?.setMode(mode)
     }
+    @objc private func releaseToggled() { session?.setCaptureOnRelease(releaseToggle.state == .on) }
     @objc private func captureClicked() { session?.capture() }
     @objc private func closeClicked() { session?.cancel() }
 }

@@ -30,7 +30,7 @@ final class CaptureSession {
     private static let handleRadius: CGFloat = 10
 
     let frozen: FrozenScreens
-    private let captureOnRelease: Bool
+    private var captureOnRelease: Bool
     private let completion: (CaptureResult?) -> Void
     private(set) var mode: CaptureMode = .selection
     private(set) var selection: CGRect?
@@ -177,6 +177,13 @@ final class CaptureSession {
     private func nudge(dx: CGFloat, dy: CGFloat) {
         guard mode == .selection, drag == nil, let current = selection else { return }
         selection = SelectionGeometry.move(current, by: CGVector(dx: dx, dy: dy), within: bounds)
+        refresh()
+    }
+
+    /// Toggled from the toolbar; remembered for future captures too.
+    func setCaptureOnRelease(_ enabled: Bool) {
+        captureOnRelease = enabled
+        Preferences.captureOnRelease = enabled
         refresh()
     }
 
