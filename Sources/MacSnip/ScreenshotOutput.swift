@@ -53,6 +53,17 @@ enum ScreenshotOutput {
         return CGImageDestinationFinalize(destination) ? data as Data : nil
     }
 
+    /// Copies a saved screenshot again, keeping its Retina scale from the PNG's DPI tag.
+    static func copyToPasteboard(fileAt url: URL) -> Bool {
+        guard let png = try? Data(contentsOf: url),
+              let source = CGImageSourceCreateWithData(png as CFData, nil),
+              let image = CGImageSourceCreateImageAtIndex(source, 0, nil) else { return false }
+        let properties = CGImageSourceCopyPropertiesAtIndex(source, 0, nil) as? [CFString: Any]
+        let dpi = (properties?[kCGImagePropertyDPIWidth] as? NSNumber)?.doubleValue ?? 72
+        copyToPasteboard(png: png, image: image, scale: max(CGFloat(dpi) / 72, 1))
+        return true
+    }
+
     private static var tiffProvider: TIFFProvider?
 
     private static func copyToPasteboard(png: Data, image: CGImage, scale: CGFloat) {

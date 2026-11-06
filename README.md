@@ -40,13 +40,15 @@ Releases are signed with the same self-signed "MacSnip Release" certificate, so 
 
 The last selection is restored the next time, as on Ubuntu. Window captures contain only the window itself, without overlapping windows. Selections can span displays. After each capture, a thumbnail appears in the bottom-right corner. Click it to open the screenshot, or drag it into another app.
 
+Menu bar icon → **Recent Screenshots** lists the last 10 PNGs in the save folder, newest first, with thumbnails. Click one to copy it to the clipboard again; hold ⌥ and click to show it in Finder.
+
 ## Settings
 
 Menu bar icon → **Settings…**:
 
 - **Capture shortcut:** click it and press new keys. As in MacMural, shortcuts use Carbon hot keys, so no Accessibility or Input Monitoring permission is needed. Any shortcut that contains ⌃⌥⌘ counts as a Hyper shortcut and is registered with and without ⇧, so it works whichever way Caps Lock is remapped to Hyper. Conflicts with macOS shortcuts are rejected.
 - **Save folder:** defaults to `~/Pictures/Screenshots`.
-- **Capture as soon as the mouse is released:** skips the confirmation step, like the older gnome-screenshot.
+- **Capture as soon as the mouse is released:** skips the confirmation step, like the older gnome-screenshot. The same checkbox is in the capture toolbar.
 - **Shutter sound** and **thumbnail:** each can be turned off.
 
 ## File names

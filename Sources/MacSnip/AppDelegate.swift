@@ -13,6 +13,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private var session: CaptureSession?
     private var isFreezing = false
     private var previousApplication: NSRunningApplication?
+    private let recentScreenshots = RecentScreenshotsMenu()
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.accessory)
@@ -52,6 +53,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         captureItem = NSMenuItem(title: "Take Screenshot", action: #selector(captureFromMenu), keyEquivalent: "")
         captureItem.target = self
         menu.addItem(captureItem)
+        let recentItem = NSMenuItem(title: "Recent Screenshots", action: nil, keyEquivalent: "")
+        recentItem.submenu = recentScreenshots.menu
+        menu.addItem(recentItem)
         menu.addItem(withTitle: "Open Screenshots Folder", action: #selector(openFolder), keyEquivalent: "").target = self
         menu.addItem(.separator())
         menu.addItem(withTitle: "Settings…", action: #selector(showSettings), keyEquivalent: ",").target = self
@@ -175,6 +179,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         }
         do {
             let url = try ScreenshotOutput.deliver(png: png, image: image, scale: scale)
+            recentScreenshots.remember(png: png, url: url)
             if Preferences.showThumbnail { ThumbnailToast.show(image: image, scale: scale, url: url, on: screen) }
         } catch {
             showAlert("The screenshot is on the clipboard but could not be saved",
