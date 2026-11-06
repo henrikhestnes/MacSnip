@@ -15,11 +15,5 @@ cask "macsnip" do
 
   zap trash: "~/Library/Preferences/io.macsnip.app.plist"
 
-  caveats <<~EOS
-    This build is signed with a self-signed certificate and has not been notarized by Apple.
-
-    MacSnip needs Screen Recording access. If you are upgrading from 1.0.0, remove MacSnip from
-    System Settings → Privacy & Security → Screen & System Audio Recording, add it again,
-    and relaunch it. Later upgrades keep the permission.
-  EOS
+  caveats "This build is signed with a self-signed certificate and has not been notarized by Apple."
 end
