@@ -16,7 +16,7 @@ To build from source instead:
 
 ```sh
 ./scripts/build.sh
-cp -R dist/MacSnip.app /Applications/
+cp -R dist.noindex/MacSnip.app /Applications/
 open /Applications/MacSnip.app
 ```
 
@@ -57,4 +57,4 @@ Names follow `yyyy-mm-dd_hh.mm.ss` on a 24-hour clock, for example `2026-10-22_1
 
 ## Releasing
 
-Bump `CFBundleShortVersionString` in `Resources/Info.plist`, run `./scripts/build.sh --universal`, put the new version and the SHA-256 of `dist/MacSnip.zip` in `Casks/macsnip.rb`, and write `releases/vX.Y.Z.md`. The build must be signed with the "MacSnip Release" certificate from the login keychain; `publish.sh` refuses any other signature, because a new certificate would make every user grant Screen Recording again. `./scripts/publish.sh --check` validates everything offline; `./scripts/publish.sh` tags the release, uploads the ZIP, and updates the cask in [henrikhestnes/homebrew-tap](https://github.com/henrikhestnes/homebrew-tap).
+Bump `CFBundleShortVersionString` in `Resources/Info.plist`, run `./scripts/build.sh --universal`, put the new version and the SHA-256 of `dist.noindex/MacSnip.zip` in `Casks/macsnip.rb`, and write `releases/vX.Y.Z.md`. The build must be signed with the "MacSnip Release" certificate from the login keychain; `publish.sh` refuses any other signature, because a new certificate would make every user grant Screen Recording again. `./scripts/publish.sh --check` validates everything offline; `./scripts/publish.sh` tags the release, uploads the ZIP, and updates the cask in [henrikhestnes/homebrew-tap](https://github.com/henrikhestnes/homebrew-tap).

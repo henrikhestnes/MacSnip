@@ -11,7 +11,7 @@ repository="henrikhestnes/MacSnip"
 version=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' Resources/Info.plist)
 tag="v$version"
 notes="releases/$tag.md"
-asset="$PWD/dist/MacSnip.zip"
+asset="$PWD/dist.noindex/MacSnip.zip"
 
 # These checks do not access GitHub, install anything, or launch the app.
 python3 - "$version" "$notes" <<'PY'
@@ -38,11 +38,11 @@ if changed - allowed:
     raise SystemExit('Commit or set aside unrelated changes first: ' + ', '.join(sorted(changed - allowed)))
 cask = Path('Casks/macsnip.rb').read_text()
 assert re.search(r'^  version "' + re.escape(version) + r'"$', cask, re.M), 'Cask version does not match the app.'
-asset = Path('dist/MacSnip.zip')
+asset = Path('dist.noindex/MacSnip.zip')
 checksum = hashlib.sha256(asset.read_bytes()).hexdigest()
 assert f'  sha256 "{checksum}"' in cask, 'Cask checksum does not match the release ZIP. Update it first.'
 assert checksum in Path(notes).read_text(), 'Release notes checksum does not match the ZIP.'
-bundle = Path('dist/MacSnip.app')
+bundle = Path('dist.noindex/MacSnip.app')
 architectures = subprocess.check_output(['lipo', '-archs', str(bundle / 'Contents/MacOS/MacSnip')], text=True).split()
 assert {'arm64', 'x86_64'} <= set(architectures), 'The release must support Apple Silicon and Intel.'
 with ZipFile(asset) as archive:
@@ -54,14 +54,14 @@ with ZipFile(asset) as archive:
         assert archive.read('MacSnip.app/' + name) == (bundle / name).read_bytes(), 'ZIP differs from the local bundle: ' + name
 print(f'Validated MacSnip {version}, release notes, cask, ZIP, and commit email.')
 PY
-codesign --verify --deep --strict dist/MacSnip.app
+codesign --verify --deep --strict dist.noindex/MacSnip.app
 # Every release must use the hardened runtime (./scripts/build.sh signs with --options runtime).
-if [[ ! "$(codesign -d --verbose=1 dist/MacSnip.app 2>&1)" =~ 'flags=0x[0-9a-f]+\([^)]*runtime' ]]; then
+if [[ ! "$(codesign -d --verbose=1 dist.noindex/MacSnip.app 2>&1)" =~ 'flags=0x[0-9a-f]+\([^)]*runtime' ]]; then
   print -u2 'The app is not signed with the hardened runtime. Rebuild with ./scripts/build.sh --universal.'
   exit 1
 fi
 # Screen Recording permission survives upgrades only while every release is signed with the same certificate.
-if [[ "$(codesign -dr - dist/MacSnip.app 2>&1)" != *'identifier "io.macsnip.app" and certificate leaf = H"60e479dee9ef30d9ac25735c29c78e492c875bea"'* ]]; then
+if [[ "$(codesign -dr - dist.noindex/MacSnip.app 2>&1)" != *'identifier "io.macsnip.app" and certificate leaf = H"60e479dee9ef30d9ac25735c29c78e492c875bea"'* ]]; then
   print -u2 'Sign the release with the "MacSnip Release" certificate (./scripts/build.sh --universal).'
   exit 1
 fi

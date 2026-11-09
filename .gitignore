@@ -1,4 +1,4 @@
 .build/
 .swiftpm/
-dist/
+dist.noindex/
 .DS_Store

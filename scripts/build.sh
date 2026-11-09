@@ -22,17 +22,17 @@ if [[ "${1:-}" == "--universal" ]]; then
 fi
 swift build -c release --disable-sandbox -debug-info-format none "${architectures[@]}"
 bin_path=$(swift build -c release --disable-sandbox -debug-info-format none "${architectures[@]}" --show-bin-path)
-app="$PWD/dist/MacSnip.app"
+app="$PWD/dist.noindex/MacSnip.app"
 mkdir -p "$app/Contents/MacOS" "$app/Contents/Resources"
 # Replace the executable instead of overwriting a binary that may be running.
 cp "$bin_path/MacSnip" "$app/Contents/MacOS/MacSnip.new"
 mv -f "$app/Contents/MacOS/MacSnip.new" "$app/Contents/MacOS/MacSnip"
 cp Resources/Info.plist "$app/Contents/Info.plist"
-swift scripts/make-icon.swift "$PWD/dist"
-cp "$PWD/dist/AppIcon.icns" "$app/Contents/Resources/AppIcon.icns"
+swift scripts/make-icon.swift "$PWD/dist.noindex"
+cp "$PWD/dist.noindex/AppIcon.icns" "$app/Contents/Resources/AppIcon.icns"
 # The hardened runtime enables library validation and ignores DYLD_* variables, so another process
 # cannot inject code into an app that holds Screen Recording access. It works with any signature.
 codesign --force --options runtime --sign "$identity" --identifier io.macsnip.app "$app"
-ditto -c -k --sequesterRsrc --keepParent "$app" "$PWD/dist/MacSnip.zip"
+ditto -c -k --sequesterRsrc --keepParent "$app" "$PWD/dist.noindex/MacSnip.zip"
 echo "Built: $app"
-echo "Install: cp -R dist/MacSnip.app /Applications/ && open /Applications/MacSnip.app"
+echo "Install: cp -R dist.noindex/MacSnip.app /Applications/ && open /Applications/MacSnip.app"
