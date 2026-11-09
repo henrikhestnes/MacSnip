@@ -77,14 +77,17 @@ final class CaptureToolbar: NSVisualEffectView {
         return window.convertToScreen(convert(bounds, to: nil)).contains(point)
     }
 
-    func update(mode: CaptureMode, captureOnRelease: Bool) {
+    func update(mode: CaptureMode, captureOnRelease: Bool, hasSelection: Bool) {
         modes.selectedSegment = mode.rawValue
         releaseToggle.state = captureOnRelease ? .on : .off
         releaseToggle.isEnabled = mode == .selection
         switch mode {
         case .selection:
-            hint.stringValue = captureOnRelease ? "Drag to capture an area · Esc to cancel"
-                                                : "Drag to select · Enter, Space or ⌘C to capture · Esc to cancel"
+            switch (captureOnRelease, hasSelection) {
+            case (true, true): hint.stringValue = "Enter captures this area · Drag to capture a new one · Esc to cancel"
+            case (true, false): hint.stringValue = "Drag to capture an area · Esc to cancel"
+            case (false, _): hint.stringValue = "Drag to select · Enter, Space or ⌘C to capture · Esc to cancel"
+            }
         case .screen: hint.stringValue = "Click a display to capture it · Esc to cancel"
         case .window: hint.stringValue = "Click a window to capture it · Esc to cancel"
         }

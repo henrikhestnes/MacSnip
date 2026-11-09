@@ -56,7 +56,7 @@ final class CaptureSession {
         self.completion = completion
         pointer = NSEvent.mouseLocation
         bounds = frozen.displays.reduce(CGRect.null) { $0.union($1.frame) }
-        if !captureOnRelease, let last = Self.lastSelection, bounds.contains(last) { selection = last }
+        if let last = Self.lastSelection, bounds.contains(last) { selection = last }
     }
 
     func show() {
@@ -255,7 +255,7 @@ final class CaptureSession {
 
     private func refresh() {
         for view in views { view.update() }
-        toolbar?.update(mode: mode, captureOnRelease: captureOnRelease)
+        toolbar?.update(mode: mode, captureOnRelease: captureOnRelease, hasSelection: selection != nil)
     }
 }
 
